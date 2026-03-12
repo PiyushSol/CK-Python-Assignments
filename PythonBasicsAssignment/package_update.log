@@ -1,0 +1,4 @@
+2026-03-12 17:08:30,061 - INFO - Checking for available package updates
+2026-03-12 17:08:43,303 - INFO - Successfully listed available updates
+2026-03-12 17:09:07,894 - INFO - Updating package: curl
+2026-03-12 17:09:56,985 - INFO - curl updated successfully
