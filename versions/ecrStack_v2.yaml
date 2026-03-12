@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ECR repositories for three tier ECS application
+
+Resources:
+
+  FrontendRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: three-tier-frontend
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      ImageTagMutability: MUTABLE
+
+  BackendRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: three-tier-backend
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      ImageTagMutability: MUTABLE
+
+Outputs:
+
+  FrontendRepoURI:
+    Description: URI of frontend repository
+    Value: !GetAtt FrontendRepository.RepositoryUri
+
+  BackendRepoURI:
+    Description: URI of backend repository
+    Value: !GetAtt BackendRepository.RepositoryUri

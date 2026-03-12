@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: RDS MySQL Database for ECS Application
+
+Parameters:
+
+  DBSubnet1:
+    Type: String
+
+  DBSubnet2:
+    Type: String
+
+  RDSSecurityGroup:
+    Type: String
+
+  DBPassword:
+    Type: String
+    NoEcho: true
+    Description: Password for RDS master user
+
+Resources:
+
+  AppDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnets for RDS instance
+      SubnetIds:
+        - !Ref DBSubnet1
+        - !Ref DBSubnet2
+      DBSubnetGroupName: app-db-subnet-group
+
+  MyDatabase:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: three-tier-db
+      AllocatedStorage: 20
+      DBInstanceClass: db.t3.micro
+      Engine: mysql
+      EngineVersion: "8.0"
+      DBName: appdb
+      MasterUsername: admin
+      MasterUserPassword: !Ref DBPassword
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup
+      DBSubnetGroupName: !Ref AppDBSubnetGroup
+      PubliclyAccessible: false
+      MultiAZ: false
+      StorageType: gp2
+      BackupRetentionPeriod: 0
+      DeletionProtection: false
+
+Outputs:
+
+  DBEndpoint:
+    Description: Endpoint for the RDS instance
+    Value: !GetAtt MyDatabase.Endpoint.Address

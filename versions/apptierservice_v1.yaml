@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ECS App Tier Service
+
+Parameters:
+
+  ECSClusterName:
+    Type: String
+
+  BackendImage:
+    Type: String
+
+  AppTargetGroupArn:
+    Type: String
+
+Resources:
+
+  AppTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: app-tier-task
+      RequiresCompatibilities:
+        - EC2
+      NetworkMode: bridge
+
+      ContainerDefinitions:
+        - Name: backend
+          Image: !Ref BackendImage
+          Essential: true
+          Memory: 256
+          Cpu: 128
+          PortMappings:
+            - ContainerPort: 4000
+              HostPort: 0
+              Protocol: tcp
+
+
+  AppECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: app-tier-service
+      Cluster: !Ref ECSClusterName
+      TaskDefinition: !Ref AppTaskDefinition
+      DesiredCount: 1
+      LaunchType: EC2
+
+      LoadBalancers:
+        - ContainerName: backend
+          ContainerPort: 4000
+          TargetGroupArn: !Ref AppTargetGroupArn
+
+
+Outputs:
+
+  AppServiceName:
+    Value: !Ref AppECSService

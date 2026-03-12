@@ -1,0 +1,14 @@
+2026-03-12 16:12:31,164 - http://www.example.com/nonexistentpage -> Status Code: 404
+2026-03-12 16:12:31,164 - ALERT: http://www.example.com/nonexistentpage returned error 404
+2026-03-12 16:12:31,323 - http://httpstat.us/404 -> Status Code: 404
+2026-03-12 16:12:31,323 - ALERT: http://httpstat.us/404 returned error 404
+2026-03-12 16:12:31,412 - http://httpstat.us/500 -> Status Code: 404
+2026-03-12 16:12:31,412 - ALERT: http://httpstat.us/500 returned error 404
+2026-03-12 16:12:32,140 - https://www.google.com/ -> Status Code: 200
+2026-03-12 16:12:52,166 - http://www.example.com/nonexistentpage -> Status Code: 404
+2026-03-12 16:12:52,166 - ALERT: http://www.example.com/nonexistentpage returned error 404
+2026-03-12 16:12:52,395 - http://httpstat.us/404 -> Status Code: 404
+2026-03-12 16:12:52,395 - ALERT: http://httpstat.us/404 returned error 404
+2026-03-12 16:12:52,479 - http://httpstat.us/500 -> Status Code: 404
+2026-03-12 16:12:52,479 - ALERT: http://httpstat.us/500 returned error 404
+2026-03-12 16:12:53,090 - https://www.google.com/ -> Status Code: 200

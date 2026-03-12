@@ -1,0 +1,181 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPC Endpoints for ECS EC2 (Private Subnets - No NAT)
+
+Parameters:
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet::Id
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet::Id
+
+  PrivateRouteTable:
+    Type: String
+    Description: Route Table ID for private subnets (rtb-xxxxxxxx)
+
+  ECSInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+
+
+Resources:
+
+  EndpointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTPS from ECS Instances
+      VpcId: !Ref VpcId
+
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId: !Ref ECSInstanceSecurityGroup
+
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+
+  # -----------------------------
+  # ECR API Endpoint
+  # -----------------------------
+  EcrApiEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VpcId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.api
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref EndpointSecurityGroup
+
+
+  # -----------------------------
+  # ECR Docker Endpoint
+  # -----------------------------
+  EcrDkrEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VpcId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.dkr
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref EndpointSecurityGroup
+
+
+  # -----------------------------
+  # CloudWatch Logs Endpoint
+  # -----------------------------
+  LogsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VpcId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.logs
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref EndpointSecurityGroup
+
+
+  # -----------------------------
+  # ECS Control Plane Endpoint
+  # -----------------------------
+  EcsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VpcId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecs
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref EndpointSecurityGroup
+
+
+  # -----------------------------
+  # ECS Agent Endpoint
+  # -----------------------------
+  EcsAgentEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VpcId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecs-agent
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref EndpointSecurityGroup
+
+
+  # -----------------------------
+  # ECS Telemetry Endpoint
+  # -----------------------------
+  EcsTelemetryEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VpcId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecs-telemetry
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref EndpointSecurityGroup
+
+
+  # -----------------------------
+  # S3 Gateway Endpoint
+  # -----------------------------
+  S3GatewayEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VpcId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
+      VpcEndpointType: Gateway
+      RouteTableIds:
+        - !Ref PrivateRouteTable
+
+
+Outputs:
+
+  EndpointSecurityGroupId:
+    Value: !Ref EndpointSecurityGroup
+
+  EcrApiEndpointId:
+    Value: !Ref EcrApiEndpoint
+
+  EcrDkrEndpointId:
+    Value: !Ref EcrDkrEndpoint
+
+  LogsEndpointId:
+    Value: !Ref LogsEndpoint
+
+  EcsEndpointId:
+    Value: !Ref EcsEndpoint
+
+  EcsAgentEndpointId:
+    Value: !Ref EcsAgentEndpoint
+
+  EcsTelemetryEndpointId:
+    Value: !Ref EcsTelemetryEndpoint
+
+  S3GatewayEndpointId:
+    Value: !Ref S3GatewayEndpoint

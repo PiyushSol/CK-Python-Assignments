@@ -1,0 +1,25 @@
+1. Find out the services with which Lambda can works. 
+2. Find out all the services which offers serverless thing on AWS.
+3. Can we trigger a lambda to another lambda in case of millions of requests.
+4. Understand concurrency in detail : reserved concurrency , provisioned concurrency
+5. Lambda Versions (Important)
+6. Difference between ALB and Api Gateway (Why and What **Very Important**)
+7. Body mapping template.
+8. API key , Learn about api working as well and different api requests.
+9. What is authorizors in Api Gateway.
+10.Dyanmo DB - No SQL Database.
+11.Sort key in Dyanmo DB.
+12.AWS Step Functions.
+13.Continous Delivery and Continous Integration difference.
+14.Also Learn about CORS
+15.Study Deduplication topic of SQS and Dead Letter Queue , When to use Standard Queue and FIFO ?
+16.Event Bridge Learn 
+
+##Services to Study in detail
+AWS EC2 ,
+RDS (Aurora , Connection Pooling , Performance Insights),
+Errors - Client Side error , Server Side Error , Troubleshooting Errors , How to find and solve Errors
+Metrics of EC2 , Lambda , RDS ,
+IAM Policies - Conditions
+NGINX Server
+

@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Web Tier ECS Service
+
+Parameters:
+
+  ECSClusterName:
+    Type: String
+
+  FrontendImage:
+    Type: String
+
+  TargetGroupArn:
+    Type: String
+
+Resources:
+
+  WebTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: web-tier-task
+      RequiresCompatibilities:
+        - EC2
+      NetworkMode: bridge
+      ContainerDefinitions:
+        - Name: frontend
+          Image: !Ref FrontendImage
+          Essential: true
+          Memory: 256
+          Cpu: 128
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 0
+
+  WebECSService:
+    Type: AWS::ECS::Service
+    DependsOn: WebTaskDefinition
+    Properties:
+      ServiceName: web-tier-service
+      Cluster: !Ref ECSClusterName
+      TaskDefinition: !Ref WebTaskDefinition
+      DesiredCount: 1
+      LaunchType: EC2
+      LoadBalancers:
+        - ContainerName: frontend
+          ContainerPort: 80
+          TargetGroupArn: !Ref TargetGroupArn
+
+Outputs:
+  ServiceName:
+    Value: !Ref WebECSService

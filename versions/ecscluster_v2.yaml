@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ECS Cluster with EC2 launch type
+
+Parameters:
+
+  VPCId:
+    Type: String
+
+  PrivateSubnet1:
+    Type: String
+
+  PrivateSubnet2:
+    Type: String
+
+  ECSSecurityGroup:
+    Type: String
+
+
+Resources:
+
+
+
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: three-tier-cluster
+
+
+
+  ECSInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ecsInstanceRoleThreeTier
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+
+
+  ECSInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref ECSInstanceRole
+
+
+
+  ECSLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: three-tier-launch-template
+      LaunchTemplateData:
+        ImageId: !Sub '{{resolve:ssm:/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id}}'
+        InstanceType: t3.medium
+
+        IamInstanceProfile:
+          Name: !Ref ECSInstanceProfile
+
+        SecurityGroupIds:
+          - !Ref ECSSecurityGroup
+
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            echo ECS_CLUSTER=three-tier-cluster >> /etc/ecs/ecs.config
+
+
+
+
+  ECSAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: three-tier-asg
+      VPCZoneIdentifier:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      LaunchTemplate:
+        LaunchTemplateId: !Ref ECSLaunchTemplate
+        Version: !GetAtt ECSLaunchTemplate.LatestVersionNumber
+      MinSize: "1"
+      MaxSize: "2"
+      DesiredCapacity: "2"
+
+
+Outputs:
+
+  ECSClusterName:
+    Description: ECS Cluster Name
+    Value: !Ref ECSCluster

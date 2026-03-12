@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: App Tier Target Group
+
+Parameters:
+  VpcId:
+    Type: String
+
+Resources:
+
+  AppTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: app-target-group
+      Port: 4000
+      Protocol: HTTP
+      VpcId: !Ref VpcId
+      TargetType: instance
+      HealthCheckPath: /health
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+
+Outputs:
+  AppTargetGroupArn:
+    Value: !Ref AppTargetGroup
